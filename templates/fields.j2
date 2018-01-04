@@ -1,0 +1,21 @@
+{% extends "create.j2" %}
+{% block fields %}
+{% for field in fieldlist %}
+{% if field.name %}
+    {{ field.name }}
+        {{ field.dtype }}
+    {% if field.required %}
+        not null
+    {% else %}
+        null
+    {% endif %}
+    {% if field.default %}
+        CONSTRAINT default_Callidus_{{ field.process }}_{{ field.zone }}_{{ field.group }}_{{ field.file }}_{{ field.name }}
+            DEFAULT {% if 'char' in field.dtype %}'{{ field.default }}'{% else %}{{ field.default }}{% endif %}
+    {% endif %}
+    {% if not loop.last %}
+    ,
+    {% endif %}
+{% endif %}
+{% endfor %}
+{% endblock %}
