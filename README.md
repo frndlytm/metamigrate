@@ -52,6 +52,6 @@ It transforms the application into a three-stage MS Access workflow:
 This workflow is generated for various GROUPS of MAPPINGS.
 
 In the case of the project for which it was developed, there were 4 separate mappings into the same generic template files
-which were fed to a cloud PaaS.
+which were fed to a cloud SaaS.
 
 For more information about the ignored 'settings.py' file, feel free to contact me directly.
