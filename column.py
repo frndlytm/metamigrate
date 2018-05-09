@@ -8,7 +8,7 @@
 
 class Column:
     def __init__(self, position, name, columntype, nullable=1, default=None):
-        self.position = position
+        self._position = position
         self.name = name
         self.columntype = columntype
         self.nullable = nullable
@@ -22,5 +22,10 @@ class Column:
             default = self.default
         ))
 
-    def get_position(self):
-        return self.position
+    @property
+    def position(self):
+        return self._position
+    @position.setter
+    def position(self, x):
+        self._position = x
+

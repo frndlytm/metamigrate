@@ -29,7 +29,11 @@ class Table:
 
     def __repr__(self):
         return self.template.render(
-            {'name': self.name, 'columns': self.columns, 'constraints': self.constraints}
+            {
+                'name': self.name,
+                'columns': sorted(self.columns, key=lambda column: column.position),
+                'constraints': self.constraints
+            }
         )
 
     def add_column(self, column):
