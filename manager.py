@@ -91,9 +91,15 @@ class MetaManager:
         tables = self._select_all(
             'information_schema.tables', ordering = ['TABLE_NAME']
         )
+        attributes = ['TABLE_SCHEMA', 'TABLE_NAME']
+
         # if we want a specific schema, filter for it.
         if schema: tables = tables[tables['TABLE_SCHEMA'] == schema]
 
+        # serialize
+        tables = tables[attributes]
+        tables = tables.to_records(index=False)
+        tables = ['.'.join(table) for table in tables]
         return tables
 
     def columns(self, schema=None):
@@ -101,7 +107,19 @@ class MetaManager:
         columns = self._select_all(
             'information_schema.columns', ordering = ['TABLE_NAME', 'COLUMN_NAME']
         )
+        columns['TABLE'] = columns['TABLE_SCHEMA']+'.'+columns['TABLE_NAME']
+        attributes = [
+            'TABLE',
+            'ORDINAL_POSITION',
+            'COLUMN_NAME',
+            'DATA_TYPE',
+            'IS_NULLABLE',
+            'COLUMN_DEFAULT'
+        ]
+
         # if we want a specific schema, filter for it.
         if schema: columns = columns[columns['TABLE_SCHEMA'] == schema]
 
+        columns = columns[attributes]
+        columns = columns.to_records(index=False)
         return columns
