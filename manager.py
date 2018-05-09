@@ -74,7 +74,7 @@ class MetaManager:
     # standard SQL operation on a database. Might want to revise this to
     # be more restrictive on a per-project schema.
     #
-    def select_all(self, table, ordering=None):
+    def _select_all(self, table, ordering=None):
         """
         Select all data from a table on the connection.
         """
@@ -85,3 +85,23 @@ class MetaManager:
         query = "select * from {0}{1}".format(table, ordering)
         data = pd.read_sql(query, self.connection)
         return data
+
+    def tables(self, schema=None):
+        # query information_schema.
+        tables = self._select_all(
+            'information_schema.tables', ordering = ['TABLE_NAME']
+        )
+        # if we want a specific schema, filter for it.
+        if schema: tables = tables[tables['TABLE_SCHEMA'] == schema]
+
+        return tables
+
+    def columns(self, schema=None):
+        # query information_schema.
+        columns = self._select_all(
+            'information_schema.columns', ordering = ['TABLE_NAME', 'COLUMN_NAME']
+        )
+        # if we want a specific schema, filter for it.
+        if schema: columns = columns[columns['TABLE_SCHEMA'] == schema]
+
+        return columns
