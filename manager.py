@@ -74,10 +74,14 @@ class MetaManager:
     # standard SQL operation on a database. Might want to revise this to
     # be more restrictive on a per-project schema.
     #
-    def select_all(self, table):
+    def select_all(self, table, ordering=None):
         """
         Select all data from a table on the connection.
         """
-        query = "select * from {0}".format(table)
+        if ordering:
+            ordering = ' ORDER BY '+','.join(ordering)
+        else:
+            ordering = ''
+        query = "select * from {0}{1}".format(table, ordering)
         data = pd.read_sql(query, self.connection)
         return data
