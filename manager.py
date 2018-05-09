@@ -19,7 +19,7 @@ class MetaManager:
     A container for our connection information and for
     selecting all data from a table.
     """
-    def __init__(self, server, database, driver, port, env, flavor):
+    def __init__(self, flavor, server, database, driver, port, env):
         """
         Establish the connection data.
         """
@@ -35,7 +35,6 @@ class MetaManager:
         """
         Connect to the database for querying.
         """
-
         self.conn = create_engine(str(self))
         return self
 
@@ -43,7 +42,7 @@ class MetaManager:
         """
         Disconnect on wrap-up.
         """
-        self.conn.close()
+        self.conn.dispose()
 
     def __str__(self):
         return '{}+pyodbc:///?odbc_connect={}'.format(self.flavor, self._params())
