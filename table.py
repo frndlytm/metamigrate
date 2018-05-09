@@ -17,7 +17,7 @@ class TableFactory:
 
     def make_table(self, name):
         template = self.env.get_template(join(self.flavor,'create.j2'))
-        return Table(template, name, None, None)
+        return Table(template, name, [], [])
 
 
 class Table:
