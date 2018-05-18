@@ -1,6 +1,6 @@
 
-CREATE TABLE Commission.SbCallidus.{{ tablename }}
+CREATE TABLE {{ schema }}.{{ tablename }}
     (
-        {% block fields %}
-        {% endblock %}
+        {% block fields %}{% endblock %}
     );
+    {% block constraints %}{% endblock %}
