@@ -1,5 +1,6 @@
 __pycache__/
 archive/
+data/
+logs/
 queries/
 settings.*
-main.py

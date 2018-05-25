@@ -1,0 +1,5 @@
+
+CREATE TABLE {{ database }}.{{ schema }}.{{ name }} (
+        {% block fields %}{% endblock fields %}
+);
+{% block constraints %}{% endblock constraints %}
