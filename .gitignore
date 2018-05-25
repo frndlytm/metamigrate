@@ -4,4 +4,3 @@ data/
 logs/
 queries/
 settings.*
-main.py
