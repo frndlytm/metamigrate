@@ -109,4 +109,5 @@ class ModelManager:
             columns = self.model[self.model['TABLE_NAME'] == table][attributes]
         else:
             columns = self.model[attributes]
-        return columns.to_records()
+        return columns.fillna(value=False).to_records()
+        # return columns.to_dict(orient='records') # For future.

@@ -16,20 +16,22 @@ class ModelFactory:
         self.flavor = flavor
         self.fieldfactory = fieldfactory
 
-    def make(self, name, fields=[], constraints=dict()):
+    def make(self, database, schema, name, fields=[], constraints=dict()):
         # get the template by flavor...
-        template = self.environment.get_template(join(self.flavor, 'create.j2'))
+        template = self.environment.get_template(self.flavor+'/create.j2')
 
         # map a serialized format onto the fields...
-        fields = map(lambda x: self.fieldfactory.make(x), fields)
+        fields = [self.fieldfactory.make(f) for f in fields]
 
         # build the table.
-        return Model(template, name, fields, constraints)
+        return Model(template, database, schema, name, fields, constraints)
 
 
 class Model:
-    def __init__(self, template, name, fields, constraints):
+    def __init__(self, template, database, schema,  name, fields, constraints):
         self.template = template
+        self.database = database
+        self.schema = schema
         self.name = name
         self.fields = fields
         self.constraints = constraints
@@ -37,6 +39,8 @@ class Model:
     def __repr__(self):
         return self.template.render(
             {
+                'database': self.database,
+                'schema': self.schema,
                 'name': self.name,
                 'fields': self.fields,
                 'constraints': self.constraints
