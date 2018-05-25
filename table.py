@@ -15,29 +15,32 @@ class TableFactory:
         self.env = env
         self.flavor = flavor
 
-    def make_table(self, name):
+    def make(self, name, fields=[], constraints={'check':[], 'primary key':[], 'foreign key':[]}):
         template = self.env.get_template(join(self.flavor,'create.j2'))
-        return Table(template, name, [], [])
+        return Table(template, name, fields, constraints)
 
 
 class Table:
-    def __init__(self, template, name, columns, constraints):
+    def __init__(self, template, name, fields, constraints):
         self.template = template
         self.name = name
-        self.columns = columns
+        self.fields = fields
         self.constraints = constraints
 
     def __repr__(self):
         return self.template.render(
             {
                 'name': self.name,
-                'columns': sorted(self.columns, key=lambda column: column.position),
+                'fields': self.fields,
                 'constraints': self.constraints
             }
         )
 
-    def add_column(self, column):
-        self.columns.append(column)
+    def add_field(self, field):
+        self.fields.append(field)
 
-    def add_constraint(self, constraint):
-        self.constraints.append(constraint)
+    def add_constraint(self, cons, cons_type):
+        try:
+            self.constraints[cons_type].append(cons)
+        except:
+            raise KeyError
