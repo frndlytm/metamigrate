@@ -17,6 +17,10 @@ class FieldFactory:
             return
 
     def _make(self, position, name, data_type, is_nullable=True, default=None):
+        #
+        # standard Field __repr__ is a dict for the
+        # Table template to consume
+        #
         return dict(
             position=position,
             name=name,
@@ -26,12 +30,22 @@ class FieldFactory:
         )
 
     def _convert_nullable(self, nullable):
+        #
+        # serialize is_nullable to True or False.
+        #
         if isinstance(nullable, bool): return nullable
         elif nullable == 'YES' or nullable == 1: return True
         elif nullable == 'NO' or nullable == 0: return False
         else: raise ValueError
 
+
     def _from_tuple(self, tup):
+        #
+        # If introspection yeilds a list, assume
+        # it's ordered correctly and make a field.
+        # This may be a bad assumption, but ModelManager
+        # handles the ordering upstream.
+        #
         return self._make(
             tup[1],     # position
             tup[2],     # name
