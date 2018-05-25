@@ -2,24 +2,22 @@
 
 {# The set of fields don't need to be provided sorted thanks to filtering. #}
 {% block fields %}
-
-{% for field in fields|sort(attribute='ordinal_position') %}
+{% for field in fields|sort(attribute='position') %}
     {{ field.name }}
         {{ field.data_type }}
-    {% if field.is_nullable %}
+        {% if field.is_nullable %}
         null
-    {% else %}
+        {% else %}
         not null
-    {% endif %}
-    {% if field.default %}
-        CONSTRAINT default_{{ schema }}_{{ field.dimension }}_{{ field.name }}
+        {% endif %}
+        {% if field.default %}
+        CONSTRAINT default_{{ schema }}_{{ field.name }}
             DEFAULT {% if 'char' in field.data_type %}'{{ field.default }}'{% else %}{{ field.default }}{% endif %}
-    {% endif %}
+        {% endif %}
     {% if not loop.last %}
     ,
     {% endif %}
 {% endfor %}
-
 {% endblock %}
 
 
@@ -27,7 +25,7 @@
 {% block constraints %}
 
 {% for check in constraints.checks %}
-    CONSTRAINT check_{{ schema }}_{{ check.dimension }}_{{ check.name }}
+    CONSTRAINT check_{{ schema }}_{{ check.model }}_{{ check.name }}
         CHECK {{ check.clause }}
 {% endfor %}
 
