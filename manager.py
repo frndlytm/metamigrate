@@ -14,12 +14,12 @@ from sqlalchemy import create_engine
 from table import TableFactory
 
 
-class MetaManager:
+class ModelManager:
     #
     # A container for our connection information and for
     # selecting all data from a table.
     #
-    def __init__(self, flavor, server, database, driver, port, env):
+    def __init__(self, flavor, server, database, driver, port, schema, env):
         """
         Establish the connection data.
         """
@@ -28,7 +28,9 @@ class MetaManager:
         self.database = database
         self.driver = driver
         self.port = port
+        self.schema = schema
         self._connection = None
+        self._model = None
         self.factory = TableFactory(env, flavor)
 
     #
@@ -42,12 +44,23 @@ class MetaManager:
     def connection(self, conn):
         self._connection = conn
 
+    #
+    # model is queried to the object on __enter__ through
+    # the _setup() function.
+    #
+    @property
+    def model(self):
+        return self._model
+    @model.setter
+    def model(self, m):
+        self._model = m
 
     #
     # enable context manager syntex for the MetaManager connection.
     #
     def __enter__(self):
         self.connection = create_engine(str(self))
+        self._setup()
         return self
 
     def __exit__(self, *args):
@@ -71,55 +84,29 @@ class MetaManager:
         )
 
     #
-    # standard SQL operation on a database. Might want to revise this to
-    # be more restrictive on a per-project schema.
+    # Helper for __enter__ to get all the meta data from the
+    # tracked schema.
     #
-    def _select_all(self, table, ordering=None):
-        """
-        Select all data from a table on the connection.
-        """
-        if ordering:
-            ordering = ' ORDER BY '+','.join(ordering)
-        else:
-            ordering = ''
-        query = "select * from {0}{1}".format(table, ordering)
-        data = pd.read_sql(query, self.connection)
-        return data
+    def _setup(self):
+        if self.connection:
+            self.model = (
+                pd.read_sql_table(
+                    '_Model', self.connection, schema=self.schema
+                )
+            )
 
-    def tables(self, schema=None):
+    def tables(self):
         # query information_schema.
-        tables = self._select_all(
-            'information_schema.tables', ordering = ['TABLE_NAME']
-        )
-        attributes = ['TABLE_SCHEMA', 'TABLE_NAME']
+        attributes = ['TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME']
+        tables = self.model[attributes]
+        tables.drop_duplicates()
+        return tables.to_records()
 
-        # if we want a specific schema, filter for it.
-        if schema: tables = tables[tables['TABLE_SCHEMA'] == schema]
-
-        # serialize
-        tables = tables[attributes]
-        tables = tables.to_records(index=False)
-        tables = ['.'.join(table) for table in tables]
-        return tables
-
-    def columns(self, schema=None):
+    def columns(self, table=None):
         # query information_schema.
-        columns = self._select_all(
-            'information_schema.columns', ordering = ['TABLE_NAME', 'COLUMN_NAME']
-        )
-        columns['TABLE'] = columns['TABLE_SCHEMA']+'.'+columns['TABLE_NAME']
         attributes = [
-            'TABLE',
-            'ORDINAL_POSITION',
-            'COLUMN_NAME',
-            'DATA_TYPE',
-            'IS_NULLABLE',
-            'COLUMN_DEFAULT'
+            'ORDINAL_POSITION', 'COLUMN_NAME', 'DATA_TYPE', 'IS_NULLABLE', 'COLUMN_DEFAULT'
         ]
-
-        # if we want a specific schema, filter for it.
-        if schema: columns = columns[columns['TABLE_SCHEMA'] == schema]
-
+        if table: columns = self.model[self.model['TABLE_NAME']==table]
         columns = columns[attributes]
-        columns = columns.to_records(index=False)
-        return columns
+        return columns.to_records()
