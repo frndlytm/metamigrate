@@ -6,7 +6,7 @@
     we only care about encoding the metadata consistently.
 """
 class FieldFactory:
-    def make(self, position, name, data_type, is_nullable=1, default=None):
+    def make(self, position, name, data_type, is_nullable=True, default=None):
         return dict(
             position=position,
             name=name,
@@ -16,7 +16,7 @@ class FieldFactory:
         )
 
     def convert_nullable(self, nullable):
-        if nullable in [False, True]: return nullable
+        if isinstance(nullable, bool): return nullable
         elif nullable == 'YES' or nullable == 1: return True
         elif nullable == 'NO' or nullable == 0: return False
         else: raise ValueError
