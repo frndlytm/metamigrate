@@ -11,7 +11,6 @@
 import pandas as pd
 from urllib.parse import quote_plus
 from sqlalchemy import create_engine
-from table import TableFactory
 
 
 class ModelManager:
@@ -19,7 +18,7 @@ class ModelManager:
     # A container for our connection information and for
     # selecting all data from a table.
     #
-    def __init__(self, flavor, server, database, driver, port, schema, env):
+    def __init__(self, flavor, server, database, driver, port, schema):
         """
         Establish the connection data.
         """
@@ -31,7 +30,7 @@ class ModelManager:
         self.schema = schema
         self._connection = None
         self._model = None
-        self.factory = TableFactory(env, flavor)
+
 
     #
     # connection is opened like a context manager through
@@ -98,8 +97,7 @@ class ModelManager:
     def tables(self):
         # query information_schema.
         attributes = ['TABLE_CATALOG', 'TABLE_SCHEMA', 'TABLE_NAME']
-        tables = self.model[attributes]
-        tables.drop_duplicates()
+        tables = self.model[attributes].drop_duplicates(keep='last')
         return tables.to_records()
 
     def columns(self, table=None):
@@ -107,6 +105,8 @@ class ModelManager:
         attributes = [
             'ORDINAL_POSITION', 'COLUMN_NAME', 'DATA_TYPE', 'IS_NULLABLE', 'COLUMN_DEFAULT'
         ]
-        if table: columns = self.model[self.model['TABLE_NAME']==table]
-        columns = columns[attributes]
+        if table:
+            columns = self.model[self.model['TABLE_NAME'] == table][attributes]
+        else:
+            columns = self.model[attributes]
         return columns.to_records()

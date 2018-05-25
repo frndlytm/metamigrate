@@ -11,9 +11,10 @@
 from os.path import join
 
 class TableFactory:
-    def __init__(self, env, flavor):
+    def __init__(self, env, flavor, factory):
         self.env = env
         self.flavor = flavor
+        self.factory = factory
 
     def make(self, name, fields=[], constraints={'check':[], 'primary key':[], 'foreign key':[]}):
         template = self.env.get_template(join(self.flavor,'create.j2'))
