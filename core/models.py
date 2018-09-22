@@ -5,15 +5,14 @@ from core.builders import TableBuilder
 
 
 class Model:
-    def __init__(self, info: DataFrame, flavor: str, tablebuilder: TableBuilder, templates: Environment) -> None:
+    def __init__(self, info: DataFrame, tablebuilder: TableBuilder, templates: Environment) -> None:
         self.info = info
-        self.flavor = flavor
         self.tablebuilder = tablebuilder
         self.templates = templates
 
     @property
     def schemas(self) -> list:
-        pass
+        pass 
     @property
     def tables(self) -> List(Table):
         pass
