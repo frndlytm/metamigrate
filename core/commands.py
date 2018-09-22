@@ -45,11 +45,20 @@ class BackupCommand(MigrateCommand):
 
 
 class MigrateMacro(MigrateCommand):
+    """MigrateMacro extends MigrateCommand to enable a list
+    of commands to execute in order. 
+    
+    The most obvious MigrateMacro will be a full redeploy, 
+    involving the BackupCommand, DropCommand, CreateCommand, 
+    and UploadCommand.
+    """
     def __init__(self, model: Model, *commands: list) -> None:
         super.__init__(self, model)
         self.commands = commands
 
     def execute(self) -> None:
+        """execute all commands in the order the were added.
+        """
         assert self.commands
         for command in self.commands:
             command.execute()
