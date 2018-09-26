@@ -106,7 +106,7 @@ class Table(ModelComponent):
             fields=list(fields)
         )
 
-    def add_field(self, field):
+    def add_field(self, field: Field) -> None:
         self.fields.append(field)
 
 
@@ -139,13 +139,13 @@ class Field(ModelComponent):
             default = self.default
         )
 
-    def _convert_nullable(self, nullable) -> bool:
+    def _convert_nullable(self, nullable: object) -> bool:
         """_convert_nullable is used during initialization to ensure
         the nullable member is a boolean.
         """
         if isinstance(nullable, bool): return nullable
         elif nullable == 'YES' or nullable == 1: return True
-        elif nullable == 'NO' or nullable == 2: return False
+        elif nullable == 'NO' or nullable == 0: return False
         else: raise ValueError
 
     
